@@ -3,6 +3,7 @@ use std::{
     fs::File,
     io::{BufReader, Read},
 };
+use std::str::FromStr;
 
 use nom::{
     character::complete::one_of,
@@ -10,11 +11,19 @@ use nom::{
     multi::many1,
     IResult, Parser, error::{make_error, ParseError},
 };
+use nom::character::complete::digit1;
 
-pub fn decimal(input: &str) -> IResult<&str, u32> {
+#[deprecated(note="please use `decimal<T>` instead")]
+pub fn decimal_legacy(input: &str) -> IResult<&str, u32> {
     let num_condition = many1(one_of("0123456789"));
     let recognize = recognize(num_condition);
     map_res(recognize, |out: &str| out.parse::<u32>()).parse(input)
+}
+
+pub fn decimal<T>(input: &str) -> IResult<&str, T>
+where T : FromStr {
+    let data = recognize(digit1);
+    map_res(data, |s| T::from_str(s))(input)
 }
 
 fn read_input(name: &str) -> String {
