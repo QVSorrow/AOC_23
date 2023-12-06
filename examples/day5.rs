@@ -45,8 +45,9 @@ mod parser {
     use nom::combinator::{map, opt, value};
     use nom::multi::{many1, separated_list1};
     use nom::sequence::{delimited, pair, terminated, tuple};
+    use advent_of_code_2023::integer;
 
-    use crate::{Almanac, AlmanacMap, Input, integer, Seeds};
+    use crate::{Almanac, AlmanacMap, Input, Seeds};
 
     pub(crate) fn parse(input: &str) -> IResult<&str, Input> {
         let parsers = (terminated(parse_seeds, empty_line),
@@ -139,10 +140,6 @@ mod parser {
     }
 }
 
-
-fn integer<T: FromStr>(input: &str) -> IResult<&str, T> {
-    map_res(digit1, |out: &str| out.parse::<T>())(input)
-}
 
 type Seeds = Vec<u64>;
 

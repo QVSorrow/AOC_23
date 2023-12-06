@@ -76,7 +76,7 @@ mod parser {
     use nom::multi::{many1, separated_list0, separated_list1};
     use nom::sequence::{delimited, separated_pair, terminated};
 
-    use advent_of_code_2023::decimal_legacy;
+    use advent_of_code_2023::{decimal, decimal_legacy};
 
     use crate::{CubeSet, Game};
 
@@ -86,7 +86,7 @@ mod parser {
     }
 
     fn parse_game(input: &str) -> IResult<&str, Game> {
-        let (input, number) = delimited(tag("Game "), decimal_legacy, tag(": "))(input)?;
+        let (input, number) = delimited(tag("Game "), decimal, tag(": "))(input)?;
         let (input, list) = context("parse_game", separated_list0(tag("; "), parse_set))(input)?;
         let game = Game::from_sets(number, list);
         Ok((input, game))
@@ -112,7 +112,7 @@ mod parser {
     }
 
     fn parse_cubes(name: &str) -> impl for<'a> Fn(&'a str) -> IResult<&'a str, u32> + '_ {
-        move |input| map(separated_pair(decimal_legacy, tag(" "), tag(name)), |(n, _)| n).parse(input)
+        move |input| map(separated_pair(decimal, tag(" "), tag(name)), |(n, _)| n).parse(input)
     }
 
 

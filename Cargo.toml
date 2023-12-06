@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 nom = "7"
 rayon = "1.8"
+derive-new = "0.6"
+
+colored = "2.0"
