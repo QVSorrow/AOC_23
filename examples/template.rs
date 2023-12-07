@@ -18,11 +18,11 @@ fn main() {
 }
 
 fn solve1(input: &Input) -> Output {
-    todo!("⚠️ Solution 1 implemented 🤦‍")
+    todo!("⚠️ Solution 1 🤦‍")
 }
 
 fn solve2(input: &Input2) -> Output {
-    todo!("⚠️ Solution 2 implemented 🤦‍")
+    todo!("⚠️ Solution 2 🤦‍")
 }
 
 mod parser {

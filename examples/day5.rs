@@ -95,7 +95,6 @@ mod parser {
     }
 
     fn empty_line(input: &str) -> IResult<&str, ()> {
-        // value((), terminated(take_till(|c| c == '\n' || c == '\r'), opt(line_ending)))(input)
         value((), opt(line_ending))(input)
     }
 
