@@ -1,11 +1,8 @@
-use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
+use std::collections::{HashMap, VecDeque};
 use std::str::FromStr;
 use std::string::ToString;
-use std::sync::Arc;
-use std::time::{Instant, SystemTime};
-use colored::Colorize;
-use derive_new::new;
 
+use colored::Colorize;
 use rayon::prelude::*;
 
 use advent_of_code_2023::{execute, Type};
@@ -43,21 +40,16 @@ fn solve2(input: &Input2) -> Output {
         .map(|original_location| {
             let mut location = original_location;
             let mut moves = moves.iter().cycle();
-            let mut distance: Option<u64> = None;
+            let mut distance: u64 = 0;
             for iteration in 1.. {
                 let next_move = unsafe { moves.next().unwrap_unchecked() };
                 location = maps.get_move(location, *next_move);
                 if location.end_with_z {
-                    let stop = distance.is_some();
-                    distance = if let Some(d) = distance {
-                        Some(iteration - d)
-                    } else {
-                        Some(iteration)
-                    };
-                    if stop { break }
+                    distance = iteration;
+                    break;
                 }
             }
-            distance.unwrap()
+            distance
         })
         .collect::<Vec<_>>();
 
@@ -88,7 +80,7 @@ mod parser {
     use nom::{IResult, Parser};
     use nom::branch::alt;
     use nom::bytes::complete::tag;
-    use nom::character::complete::{alpha1, alphanumeric1, line_ending};
+    use nom::character::complete::{alphanumeric1, line_ending};
     use nom::combinator::{map, opt, value};
     use nom::multi::many1;
     use nom::sequence::{delimited, separated_pair, terminated};
@@ -207,8 +199,8 @@ impl Maps {
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::parse;
     use crate::{solve1, solve2};
+    use crate::parser::parse;
 
     #[test]
     fn demo_1() {
