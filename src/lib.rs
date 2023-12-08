@@ -5,6 +5,7 @@ use std::{
 };
 use std::process::exit;
 use std::str::FromStr;
+use std::time::Instant;
 
 use colored::Colorize;
 use nom::{
@@ -76,6 +77,7 @@ pub fn execute<O, R>(
 ) where
     R: Display,
 {
+    let time = Instant::now();
     let file_name = format!("examples/day{}/{}", day, t.file());
     let data = read_input(&file_name);
     let (remain, mut parsed) = match parse(&data) {
@@ -95,6 +97,7 @@ pub fn execute<O, R>(
     }
     let result = solve(&mut parsed);
     println!("Day {}. Task {} -> {}", day.to_string().blue(), t.task().green(), result.to_string().yellow());
+    println!("Duration: {}", format!("{:?}", time.elapsed()).red());
 }
 
 pub fn window<'i, O, E: ParseError<&'i str>, F>(
