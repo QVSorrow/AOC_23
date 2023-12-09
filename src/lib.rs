@@ -12,7 +12,10 @@ use nom::{
     combinator::{map_res, recognize},
     error::{make_error, ParseError}, IResult, Parser,
 };
+use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
+use nom::combinator::{consumed, opt};
+use nom::sequence::pair;
 
 pub fn decimal<T>(input: &str) -> IResult<&str, T>
     where T: FromStr {
@@ -66,7 +69,7 @@ impl Type {
 }
 
 pub fn integer<T: FromStr>(input: &str) -> IResult<&str, T> {
-    map_res(digit1, |out: &str| out.parse::<T>())(input)
+    map_res(consumed(pair(opt(tag("-")), digit1)), |(out, ..)| T::from_str(out))(input)
 }
 
 pub fn execute<O, R>(
