@@ -3,6 +3,8 @@ use std::{
     fs::File,
     io::{BufReader, Read},
 };
+use std::iter::Product;
+use std::ops::{Div, Mul, Sub};
 use std::process::exit;
 use std::str::FromStr;
 use std::time::Instant;
@@ -16,6 +18,8 @@ use nom::bytes::complete::tag;
 use nom::character::complete::digit1;
 use nom::combinator::{consumed, opt};
 use nom::sequence::pair;
+use num::{PrimInt, Unsigned};
+use tracing::level_filters::LevelFilter;
 
 pub fn decimal<T>(input: &str) -> IResult<&str, T>
     where T: FromStr {
@@ -121,4 +125,47 @@ pub fn window<'i, O, E: ParseError<&'i str>, F>(
         }
         Err(nom::Err::Error(make_error(input, nom::error::ErrorKind::Fail)))
     }
+}
+
+#[allow(non_snake_case)]
+pub fn nCk<N>(n: N, k: N) -> N where N: PrimInt + Unsigned + Product + Copy + Mul + Sub + Div {
+    factorial(n) / (factorial(k) * factorial(n - k))
+}
+
+#[allow(non_snake_case)]
+pub fn nAk<N>(n: N, k: N) -> N where N: PrimInt + Unsigned + Product + Copy + Mul + Sub + Div {
+    factorial(n) / factorial(n - k)
+}
+
+pub fn factorial<T>(n: T) -> T
+    where T: PrimInt + Unsigned + Product
+{
+    num::range(T::one(), n + T::one()).product()
+}
+
+pub fn with_trace_logging() {
+    logging(LevelFilter::TRACE)
+}
+
+pub fn with_debug_logging() {
+    logging(LevelFilter::DEBUG)
+}
+
+pub fn with_info_logging() {
+    logging(LevelFilter::INFO)
+}
+
+pub fn without_logging() {
+    logging(LevelFilter::OFF)
+}
+
+pub fn logging(level: LevelFilter) {
+    color_eyre::install().unwrap();
+    let subscriber = tracing_subscriber::fmt()
+        .compact()
+        .without_time()
+        .with_target(false)
+        .with_max_level(level)
+        .finish();
+    tracing::subscriber::set_global_default(subscriber).unwrap();
 }
