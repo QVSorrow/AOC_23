@@ -1,3 +1,5 @@
+mod dp_probem;
+
 use std::{
     fmt::Display,
     fs::File,
@@ -163,8 +165,8 @@ pub fn logging(level: LevelFilter) {
     color_eyre::install().unwrap();
     let subscriber = tracing_subscriber::fmt()
         .compact()
-        .without_time()
-        .with_target(false)
+        // .without_time()
+        // .with_target(false)
         .with_max_level(level)
         .finish();
     tracing::subscriber::set_global_default(subscriber).unwrap();

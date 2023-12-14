@@ -93,8 +93,7 @@ fn check(
     if remaining == 0 {
         let slice = used.as_slice();
         let is_valid = verify(row, slice);
-        let row = visualize(row, slice);
-        debug!("{row}   -    {}  {slice:?}", if is_valid { "valid" } else { "invalid" });
+        debug!("{}   -    {}  {slice:?}", visualize(row, slice), if is_valid { "valid" } else { "invalid" });
         result(slice, is_valid);
         return;
     }
@@ -201,8 +200,9 @@ enum Status {
 mod parser {
     use nom::branch::alt;
     use nom::bytes::complete::tag;
+    use nom::character::complete;
     use nom::character::complete::line_ending;
-    use nom::combinator::{opt, value};
+    use nom::combinator::{complete, opt, value};
     use nom::IResult;
     use nom::multi::{many1, separated_list1};
     use nom::sequence::{separated_pair, terminated};
@@ -232,7 +232,7 @@ mod parser {
     }
 
     fn damaged_groups(input: &str) -> IResult<&str, Vec<u32>> {
-        separated_list1(tag(","), integer::<u32>)(input)
+        separated_list1(tag(","), complete::u32)(input)
     }
 
     pub(crate) fn parse2(input: &str) -> IResult<&str, Input2> {
@@ -242,6 +242,7 @@ mod parser {
 
 #[cfg(test)]
 mod tests {
+    use tracing::warn;
     use advent_of_code_2023::*;
 
     use crate::parser::parse;
