@@ -1,4 +1,4 @@
-mod dp_probem;
+pub mod matrix;
 
 use std::{
     fmt::Display,
@@ -146,28 +146,28 @@ pub fn factorial<T>(n: T) -> T
 }
 
 pub fn with_trace_logging() {
-    logging(LevelFilter::TRACE)
+    tracing(LevelFilter::TRACE)
 }
 
 pub fn with_debug_logging() {
-    logging(LevelFilter::DEBUG)
+    tracing(LevelFilter::DEBUG)
 }
 
 pub fn with_info_logging() {
-    logging(LevelFilter::INFO)
+    tracing(LevelFilter::INFO)
 }
 
 pub fn without_logging() {
-    logging(LevelFilter::OFF)
+    tracing(LevelFilter::OFF)
 }
 
-pub fn logging(level: LevelFilter) {
-    color_eyre::install().unwrap();
+pub fn tracing(level: LevelFilter) {
+    let _ = color_eyre::install();
     let subscriber = tracing_subscriber::fmt()
         .compact()
-        // .without_time()
-        // .with_target(false)
+        .without_time()
+        .with_target(false)
         .with_max_level(level)
         .finish();
-    tracing::subscriber::set_global_default(subscriber).unwrap();
+    let _ = tracing::subscriber::set_global_default(subscriber).is_ok();
 }
