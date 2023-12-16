@@ -1,17 +1,22 @@
 use std::ops::Range;
 use std::str::FromStr;
+use iset::IntervalMap;
+use itertools::Itertools;
 
 use nom::character::complete::digit1;
 use nom::combinator::map_res;
 use nom::IResult;
 use rayon::prelude::*;
+use tracing::debug;
+use tracing_subscriber::filter::LevelFilter;
 
-use advent_of_code_2023::{execute, Type};
+use advent_of_code_2023::{execute, tracing, Type};
 
 type Input = (Almanac, Seeds);
 type Output = u64;
 
 fn main() {
+    // tracing(LevelFilter::DEBUG);
     execute(5, Type::Demo, parser::parse, |values| solve1(values));
     execute(5, Type::Task1, parser::parse, |values| solve1(values));
     execute(5, Type::Demo, parser::parse, |values| solve2(values));
@@ -29,10 +34,9 @@ fn solve1(input: &Input) -> Output {
 
 fn solve2(input: &Input) -> Output {
     let almanac = &input.0;
-    let min_location = input.1.chunks_exact(2)
-        .map(|arr| (arr[0], arr[1]))
+    let min_location = input.1.iter().tuple_windows()
         .par_bridge()
-        .flat_map(|(start, length)| start..(start + length))
+        .flat_map(|(&start, &length)| start..(start + length))
         .map(|seed| almanac.seed_to_location(seed))
         .min().expect("Any seeds present");
     min_location
@@ -45,6 +49,7 @@ mod parser {
     use nom::combinator::{map, opt, value};
     use nom::multi::{many1, separated_list1};
     use nom::sequence::{delimited, pair, terminated, tuple};
+    use tracing::debug;
     use advent_of_code_2023::integer;
 
     use crate::{Almanac, AlmanacMap, Input, Seeds};
@@ -81,12 +86,12 @@ mod parser {
             humidity_to_location,
         };
 
-        println!("Parsed almanac");
+        debug!("Parsed almanac");
         Ok((input, (almanac, seeds)))
     }
 
     fn parse_seeds(input: &str) -> IResult<&str, Seeds> {
-        println!("Parsing seeds");
+        debug!("Parsing seeds");
         delimited(
             tag("seeds: "),
             separated_list1(tag(" "), integer),
@@ -118,7 +123,7 @@ mod parser {
             for Entry { source, destination, length } in entries {
                 map.add(source, destination, length);
             }
-            println!("Parsed {} map", name);
+            debug!("Parsed {} map", name);
             Ok((input, map))
         }
     }
@@ -173,23 +178,24 @@ impl Almanac {
         let temperature = self.light_to_temperature.map(light);
         let humidity = self.temperature_to_humidity.map(temperature);
         let location = self.humidity_to_location.map(humidity);
-        println!("seed({seed}) -> soil({soil}) -> fertilizer({fertilizer}) -> water({water}) -> light({light}) -> temperature({temperature}) -> humidity({humidity}) -> location({location})");
+        debug!("seed({seed}) -> soil({soil}) -> fertilizer({fertilizer}) -> water({water}) -> light({light}) -> temperature({temperature}) -> humidity({humidity}) -> location({location})");
         location
     }
 }
 
 #[derive(Debug, Clone, Default)]
 struct AlmanacMap {
-    vec: Vec<(Range<u64>, Range<u64>)>,
+    map: IntervalMap<u64, Range<u64>>,
 }
 
 impl AlmanacMap {
     fn add(&mut self, from: u64, to: u64, len: u64) {
-        self.vec.push((from..(from + len), to..(to + len)));
+        self.map.insert(from..from + len, to..to + len);
     }
 
+    #[inline(always)]
     fn map(&self, from: u64) -> u64 {
-        let range = self.vec.iter().find(|(range, ..)| range.contains(&from));
+        let range = self.map.overlap(from).next();
         if let Some((source, destination)) = range {
             let index = from - source.start;
             destination.start + index

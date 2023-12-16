@@ -12,12 +12,13 @@ derive-new = "0.6"
 num = "0.4"
 itertools = "0.12.0"
 memoize = "0.4"
+iset = "0.2"
 
 colored = "2.0"
 
 color-eyre = "0.6"
 
-tracing = "0.1"
+tracing = { version = "0.1", features = ["max_level_trace"] }
 tracing-subscriber = "0.3"
 tracing-test = "0.2"
 log = "0.4.20"

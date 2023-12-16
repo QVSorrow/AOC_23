@@ -2,7 +2,7 @@ use std::fmt::{Display, Formatter};
 use std::ops::IndexMut;
 use itertools::Itertools;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub struct Matrix<T> {
     inner: Vec<T>,
     size: Size,
@@ -82,7 +82,7 @@ impl Index {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct Size(usize, usize);
 
 impl Size {

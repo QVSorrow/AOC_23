@@ -1,10 +1,11 @@
 use std::str::FromStr;
-use derive_new::new;
-use itertools::{enumerate, Itertools};
 
+use derive_new::new;
+use itertools::Itertools;
 use rayon::prelude::*;
 use tracing::{debug, trace};
 use tracing::metadata::LevelFilter;
+
 use advent_of_code_2023::{execute, tracing, Type};
 use advent_of_code_2023::matrix::Matrix;
 
@@ -132,7 +133,7 @@ fn is_same_with_smudge<'a>(
                 rem_smudges -= 1;
             } else {
                 is_equal = false;
-                break
+                break;
             }
         }
     }
@@ -168,11 +169,9 @@ enum Symbol {
 #[cfg(test)]
 mod tests {
     use rstest::rstest;
-    use tracing::metadata::LevelFilter;
     use tracing_test::traced_test;
-    use advent_of_code_2023::tracing;
 
-    use crate::{find_mirror, parser, solve1};
+    use crate::{find_mirror, parser};
 
     #[traced_test]
     #[rstest]
@@ -231,11 +230,12 @@ mod parser {
     use itertools::Itertools;
     use nom::branch::alt;
     use nom::bytes::complete::tag;
-    use nom::character::complete::{line_ending, space0};
+    use nom::character::complete::line_ending;
     use nom::combinator::{opt, value};
     use nom::IResult;
     use nom::multi::{many1, separated_list1};
     use nom::sequence::terminated;
+
     use advent_of_code_2023::matrix::Matrix;
 
     use crate::{Input, Input2, Symbol};
